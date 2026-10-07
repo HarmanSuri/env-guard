@@ -70,6 +70,7 @@ pub fn calculate_entropy(text: &str) -> f64 {
         }
     }
 
+    println!("Entropy for {} is: {}", text, -entropy);
     -entropy
 }
 
