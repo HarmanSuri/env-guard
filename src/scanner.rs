@@ -33,6 +33,8 @@ impl Default for ScannerConfig {
     }
 }
 
+pub const IGNORE_DIRECTIVE: &str = "envguard:ignore";
+
 pub struct Scanner {
     config: ScannerConfig,
     pattern_matcher: PatternMatcher,
@@ -52,6 +54,10 @@ impl Scanner {
 
         for file in staged_files {
             for line in &file.lines {
+                if line.text.contains(IGNORE_DIRECTIVE) {
+                    continue;
+                }
+
                 let mut matched_by_pattern = false;
 
                 // Detect by pattern matching
