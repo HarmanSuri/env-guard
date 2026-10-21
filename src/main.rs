@@ -1,6 +1,7 @@
 use clap::Parser;
 use env_guard::cli::{Cli, Commands};
 use env_guard::git::get_staged_changes;
+use env_guard::hooks::install_pre_commit_hook; // envguard:ignore
 use env_guard::scanner::FoundSecret;
 use env_guard::scanner::{Scanner, ScannerConfig};
 use std::process::ExitCode;
@@ -11,6 +12,16 @@ fn main() -> ExitCode {
     match args.command {
         Commands::Scan { entropy_threshold } => run_scan(entropy_threshold),
         Commands::InstallHook => run_install_hook(),
+    }
+}
+
+fn run_install_hook() -> ExitCode {
+    match install_pre_commit_hook() {
+        Ok(_) => ExitCode::SUCCESS,
+        Err(err) => {
+            eprintln!("\x1b[1;31m[!] Error installing git hook:\x1b[0m {}", err);
+            ExitCode::FAILURE
+        }
     }
 }
 
@@ -48,6 +59,7 @@ fn run_scan(entropy_threshold: f64) -> ExitCode {
         return ExitCode::FAILURE;
     }
 }
+
 fn print_findings(findings: &[FoundSecret]) {
     eprintln!("\x1b[1;31m[!] EnvGuard detected potential secret(s) in staged changes:\x1b[0m\n");
 
@@ -62,9 +74,4 @@ fn print_findings(findings: &[FoundSecret]) {
     }
 
     eprintln!("\x1b[1;31mCommit aborted. Please remove secrets before committing.\x1b[0m");
-}
-
-fn run_install_hook() -> ExitCode {
-    // TODO: We will implement Git hook installation next!
-    todo!()
 }

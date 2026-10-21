@@ -21,6 +21,12 @@ fn test_scanner_dual_engine() {
                 line_number: 14,
                 text: "let config_path = \"/usr/local/bin/app\";".to_string(),
             },
+            // Line 4: Ignore Directive Code - Should generate NO findings
+            StagedLine {
+                line_number: 15,
+                text: "use env_guard::hooks::install_pre_commit_hook; // envguard:ignore"
+                    .to_string(),
+            },
         ],
     }];
 

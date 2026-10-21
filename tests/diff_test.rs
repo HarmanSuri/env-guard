@@ -31,4 +31,30 @@ index 83db48f..f735b23 100644
         assert_eq!(result[0].lines[1].line_number, 16);
         assert_eq!(result[0].lines[1].text, "const PORT: u16 = 8080;");
     }
+
+    #[test]
+    fn test_parse_unified_diff_new_file() {
+        let sample_diff = r#"
+diff --git a/test_secret.rs b/test_secret.rs
+new file mode 100644
+index 0000000..341d62f
+--- /dev/null
++++ b/test_secret.rs
+@@ -0,0 +1,2 @@
++let key = "AKIAIOSFODNN7EXAMPLE";
++
+"#;
+
+        let result: Vec<StagedFile> = parse_unified_diff(sample_diff);
+        assert_eq!(result.len(), 1);
+        assert_eq!(result[0].path, "test_secret.rs");
+        assert_eq!(result[0].lines.len(), 2);
+        assert_eq!(result[0].lines[0].line_number, 1);
+        assert_eq!(
+            result[0].lines[0].text,
+            "let key = \"AKIAIOSFODNN7EXAMPLE\";"
+        );
+        assert_eq!(result[0].lines[1].line_number, 2);
+        assert_eq!(result[0].lines[1].text, "");
+    }
 }
