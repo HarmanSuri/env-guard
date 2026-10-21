@@ -147,12 +147,12 @@ flowchart TD
 
 ### Key Stages
 
-1. **Staged-Only Git Diffing ([`src/git.rs`]()):**
-   Executes `git diff --cached -U0 --text` via [`get_staged_changes`]() to retrieve only the additions staged for the upcoming commit. Using `-U0` strips redundant context lines, ensuring only newly introduced or modified lines are evaluated.
-2. **Encoding & Line Normalization ([`parse_unified_diff`]()):**
+1. **Staged-Only Git Diffing ([`src/git.rs`](src/git.rs)):**
+   Executes `git diff --cached -U0 --text` via [`get_staged_changes`](src/git.rs#L44) to retrieve only the additions staged for the upcoming commit. Using `-U0` strips redundant context lines, ensuring only newly introduced or modified lines are evaluated.
+2. **Encoding & Line Normalization ([`parse_unified_diff`](src/git.rs#L62)):**
    Diff lines are parsed and sanitized to handle UTF-8 and UTF-16LE/BE files (such as files created by Windows PowerShell), removing BOMs (`\u{feff}`), null bytes (`\0`), and carriage returns (`\r`).
-3. **Dual Detection Engine ([`src/scanner.rs`]()):**
-   - **Pattern Matching ([`src/scanner/patterns.rs`]()):** Scans lines using pre-compiled regex patterns for recognizable credentials (e.g., AWS Access Keys, GitHub Personal Access Tokens, Slack tokens, Private Keys).
-   - **Entropy Fallback ([`src/scanner/entropy.rs`]()):** For lines with no signature match, candidate tokens are extracted via [`extract_candidate_tokens`]() and evaluated for Shannon Entropy via [`calculate_entropy`](). Tokens exceeding the configured threshold (default `4.0` bits/char) are flagged as potential secrets.
-4. **Interactive Security Interruption ([`src/main.rs`]()):**
-   If violations are found, [`print_findings`]() emits ANSI-formatted terminal alerts showing the file path, line number, detector type, and offending line snippet, returning `ExitCode::FAILURE` to halt the commit.
+3. **Dual Detection Engine ([`src/scanner.rs`](src/scanner.rs)):**
+   - **Pattern Matching ([`src/scanner/patterns.rs`](src/scanner/patterns.rs)):** Scans lines using pre-compiled regex patterns for recognizable credentials (e.g., AWS Access Keys, GitHub Personal Access Tokens, Slack tokens, Private Keys).
+   - **Entropy Fallback ([`src/scanner/entropy.rs`](src/scanner/entropy.rs)):** For lines with no signature match, candidate tokens are extracted via [`extract_candidate_tokens`](src/scanner/entropy.rs#L25) and evaluated for Shannon Entropy via [`calculate_entropy`](src/scanner/entropy.rs#L50). Tokens exceeding the configured threshold (default `4.0` bits/char) are flagged as potential secrets.
+4. **Interactive Security Interruption ([`src/main.rs`](src/main.rs)):**
+   If violations are found, [`print_findings`](src/main.rs#L63) emits ANSI-formatted terminal alerts showing the file path, line number, detector type, and offending line snippet, returning `ExitCode::FAILURE` to halt the commit.
